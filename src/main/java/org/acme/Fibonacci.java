@@ -1,23 +1,39 @@
 package org.acme;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+
+@ApplicationScoped
 public class Fibonacci {
 
+    @Transactional
     public long calculate(int n) {
         if (n < 0) {
-            throw new IllegalArgumentException("Fibonacci number cannot be negative.");
+            throw new IllegalArgumentException("Input must be a non-negative integer");
         }
+        
+        // Check cache first
+        FibonacciCache cached = FibonacciCache.findByN(n);
+        if (cached != null) {
+            return cached.result;
+        }
+        
+        // Calculate if not cached
+        long result = fibonacci(n);
+        
+        // Save to cache
+        FibonacciCache cache = new FibonacciCache();
+        cache.n = n;
+        cache.result = result;
+        cache.persist();
+        
+        return result;
+    }
+
+    private long fibonacci(int n) {
         if (n <= 1) {
             return n;
         }
-
-        long fib = 1;
-        long prevFib = 1;
-
-        for (int i = 2; i < n; i++) {
-            long temp = fib;
-            fib += prevFib;
-            prevFib = temp;
-        }
-        return fib;
+        return fibonacci(n - 1) + fibonacci(n - 2);
     }
-} 
+}

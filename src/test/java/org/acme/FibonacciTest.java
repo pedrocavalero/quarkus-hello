@@ -1,17 +1,20 @@
 package org.acme;
 
+import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class FibonacciTest {
 
+    @Inject
+    Fibonacci fib;
+
     @Test
     public void testCalculate() {
-        Fibonacci fib = new Fibonacci();
         assertEquals(0, fib.calculate(0));
         assertEquals(1, fib.calculate(1));
         assertEquals(1, fib.calculate(2));
@@ -23,9 +26,8 @@ public class FibonacciTest {
 
     @Test
     public void testNegativeInput() {
-        Fibonacci fib = new Fibonacci();
         assertThrows(IllegalArgumentException.class, () -> {
             fib.calculate(-1);
         });
     }
-} 
+}
